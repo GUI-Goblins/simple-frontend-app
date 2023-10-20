@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './QuestForge.css';
+
 
 function QuestForge() {
   const [data, setData] = useState(null);
@@ -42,7 +44,7 @@ function QuestForge() {
   };
 
   const renderOptions = () => {
-    if (data) {
+    if (data && !data.deathScene) {
       return data.options.map((option, index) => (
         <div key={index}>
           <input
@@ -50,45 +52,56 @@ function QuestForge() {
             name='userChoice'
             value={index}
             id={`option${index}`}
-            onChange={(e) => setUserChoice(option)} // Set userChoice to the option
-            checked={userChoice === option} // Compare userChoice with option
+            onChange={(e) => setUserChoice(option)}
+            checked={userChoice === option}
           />
           <label htmlFor={`option${index}`}>{option}</label>
         </div>
       ));
+    } else {
+      return null;
     }
   };
 
-
   return (
     <div>
-      <h1>Adventure Game</h1>
+      <h1>Quest Forge</h1>
       <div id='userInfo'>
-        {data && (
-          <div>
-            <p>
-              Name: <span id='userName'>{data.user.name}</span>
-            </p>
-            <p>
-              Age: <span id='userAge'>{data.user.age}</span>
-            </p>
-            <p>
-              Race: <span id='userRace'>{data.user.race}</span>
-            </p>
-            <p>
-              Class: <span id='userClass'>{data.user.class}</span>
-            </p>
-          </div>
+        {data ? (
+          data.deathScene ? (
+            <div>
+              <p id="death-scene">{data.deathScene}</p>
+            </div>
+          ) : (
+            <div>
+              <p>
+                Name: <span id='userName'>{data.user.name}</span>
+              </p>
+              <p>
+                Age: <span id='userAge'>{data.user.age}</span>
+              </p>
+              <p>
+                Race: <span id='userRace'>{data.user.race}</span>
+              </p>
+              <p>
+                Class: <span id='userClass'>{data.user.class}</span>
+              </p>
+            </div>
+          )
+        ) : (
+          <p>Loading...</p>
         )}
       </div>
-      <div id='scene'>{data ? data.scene : ''}</div>
-      <form id='optionsForm' onSubmit={handleUserChoice}>
-        <fieldset>
-          <legend>Options</legend>
-          <div id='optionsList'>{renderOptions()}</div>
-        </fieldset>
-        <button type='submit'>Submit Choice</button>
-      </form>
+      {data && data.scene ? <div id='scene'>{data.scene}</div> : null}
+      {data && !data.deathScene ? (
+        <form id='optionsForm' onSubmit={handleUserChoice}>
+          <fieldset>
+            <legend>Options</legend>
+            <div id='optionsList'>{renderOptions()}</div>
+          </fieldset>
+          <button type='submit'>Submit Choice</button>
+        </form>
+      ) : null}
     </div>
   );
 }
